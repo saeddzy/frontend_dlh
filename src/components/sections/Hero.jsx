@@ -139,9 +139,19 @@ export default function Hero() {
   const [imageNudge, setImageNudge] = useState(false);
   const [nudgeDirection, setNudgeDirection] = useState(1);
   const [weatherOpen, setWeatherOpen] = useState(false);
+  /** Geser vertikal klip/panel cuaca (px); desktop: dari titik tengah, mobile: dari anchor bawah */
+  const [weatherDragY, setWeatherDragY] = useState(0);
+  const [weatherDragging, setWeatherDragging] = useState(false);
+  const [isDesktop, setIsDesktop] = useState(
+    typeof window !== 'undefined' ? window.matchMedia('(min-width: 768px)').matches : true
+  );
   /** Ref sinkron dengan progress autoplay — hindari double advance (loncat slide) saat update state bersamaan */
   const progressRef = useRef(0);
   const nudgeTimerRef = useRef(null);
+  const weatherDragStartY = useRef(0);
+  const weatherDragStartOffset = useRef(0);
+  const weatherPanelRef = useRef(null);
+  const weatherDraggingRef = useRef(false);
 
   const resetSlideTimer = () => {
     progressRef.current = 0;
@@ -168,6 +178,13 @@ export default function Hero() {
     };
   }, []);
 
+  useEffect(() => {
+    const mq = window.matchMedia('(min-width: 768px)');
+    const onChange = () => setIsDesktop(mq.matches);
+    mq.addEventListener('change', onChange);
+    return () => mq.removeEventListener('change', onChange);
+  }, []);
+
   const handlePrev = () => {
     setCurrentSlide((prev) => (prev - 1 + heroSlides.length) % heroSlides.length);
     resetSlideTimer();
@@ -190,8 +207,65 @@ export default function Hero() {
     'flex h-10 w-10 items-center justify-center rounded-full border border-emerald-500/40 bg-dlh-green text-white shadow-md transition-all duration-200 ease-out hover:-translate-y-0.5 hover:bg-emerald-600 hover:shadow-lg hover:shadow-emerald-900/30 active:translate-y-0 active:scale-95 focus-visible:outline focus-visible:ring-2 focus-visible:ring-emerald-300 focus-visible:ring-offset-2 focus-visible:ring-offset-transparent';
   const activeWeatherType = getWeatherType(weatherRows[0].cond);
 
+  const clampWeatherDrag = (nextY) => {
+    const el = weatherPanelRef.current;
+    const margin = 6;
+    const vh = typeof window !== 'undefined' ? window.innerHeight : 800;
+    const h = el?.getBoundingClientRect().height ?? el?.offsetHeight ?? 280;
+    // Ruang geometris dari titik tengah / jangkar (bisa kecil jika panel hampir se-tinggi layar)
+    const spaceHalf = Math.max(0, (vh - h) / 2 - margin);
+    // Jarak geser minimal supaya terasa panjang; dibatasi supaya tidak keluar layar berlebihan
+    const minHalf = isDesktop ? 220 : 170;
+    const capHalf = isDesktop ? 460 : 380;
+    const max = Math.min(Math.max(spaceHalf, minHalf), capHalf);
+    const min = -max;
+    return Math.max(min, Math.min(max, nextY));
+  };
+
+  const onWeatherClipPointerDown = (e) => {
+    if (e.button !== 0 && e.pointerType === 'mouse') return;
+    if (e.target.closest('button')) return;
+    e.preventDefault();
+    weatherDragStartY.current = e.clientY;
+    weatherDragStartOffset.current = weatherDragY;
+    weatherDraggingRef.current = true;
+    setWeatherDragging(true);
+    try {
+      e.currentTarget.setPointerCapture(e.pointerId);
+    } catch {
+      /* ignore */
+    }
+  };
+
+  const onWeatherClipPointerMove = (e) => {
+    if (!weatherDraggingRef.current) return;
+    const dy = e.clientY - weatherDragStartY.current;
+    const raw = weatherDragStartOffset.current + (isDesktop ? dy : -dy);
+    setWeatherDragY(clampWeatherDrag(raw));
+  };
+
+  const endWeatherDrag = (e) => {
+    if (!weatherDraggingRef.current) return;
+    weatherDraggingRef.current = false;
+    setWeatherDragging(false);
+    try {
+      if (e?.currentTarget?.hasPointerCapture?.(e.pointerId)) {
+        e.currentTarget.releasePointerCapture(e.pointerId);
+      }
+    } catch {
+      /* ignore */
+    }
+  };
+
+  const weatherOuterStyle = isDesktop
+    ? { top: '50%', transform: `translateY(calc(-50% + ${weatherDragY}px))` }
+    : {
+        bottom: 'max(5.5rem, env(safe-area-inset-bottom, 0px))',
+        transform: `translateY(${-weatherDragY}px)`,
+      };
+
   return (
-    <section className="relative min-h-[88vh] overflow-hidden pb-0">
+    <section className="relative min-h-[88vh] overflow-x-hidden pb-0">
       <div
         className="absolute inset-0 bg-cover bg-center"
         style={{ backgroundImage: `url(${HERO_BG})` }}
@@ -199,15 +273,29 @@ export default function Hero() {
       <div className="absolute inset-0 bg-gradient-to-b from-emerald-900/55 via-emerald-800/35 to-emerald-950/75" />
 
       <div
-        className={`fixed right-0 top-1/2 z-[100] flex h-full max-h-[700px] -translate-y-1/2 transform items-center overflow-hidden py-4 transition-transform duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] ${
-          weatherOpen ? 'translate-x-0' : 'translate-x-[300px] md:translate-x-[380px]'
-        } pointer-events-none`}
+        ref={weatherPanelRef}
+        className="fixed right-0 z-[100] pointer-events-none max-md:left-auto md:max-h-[min(700px,92vh)] md:overflow-visible"
+        style={weatherOuterStyle}
       >
-        <div className="pointer-events-auto flex w-[75px] flex-col items-center justify-center rounded-bl-2xl rounded-tl-2xl border border-white/25 bg-[#2f3135] p-2 text-white shadow-2xl">
-          <h5 className="mb-1 text-3xl font-semibold leading-none">
-            23<span className="ml-1 text-xl leading-none text-yellow-500">℃</span>
+        <div
+          className={`flex items-center py-3 pointer-events-none md:py-4 ${
+            weatherDragging ? '' : 'transition-transform duration-300 ease-[cubic-bezier(0.22,1,0.36,1)]'
+          } ${weatherOpen ? 'translate-x-0' : 'translate-x-[300px] md:translate-x-[380px]'}`}
+        >
+        {/* Klip kiri: pegangan geser atas/bawah; tombol buka panel tidak memicu drag */}
+        <div
+          className="pointer-events-auto flex w-[72px] shrink-0 cursor-grab flex-col items-center justify-center rounded-bl-2xl rounded-tl-2xl border border-white/25 bg-[#2f3135] p-2 text-white shadow-2xl touch-none select-none active:cursor-grabbing sm:w-[75px]"
+          onPointerDown={onWeatherClipPointerDown}
+          onPointerMove={onWeatherClipPointerMove}
+          onPointerUp={endWeatherDrag}
+          onPointerCancel={endWeatherDrag}
+          onLostPointerCapture={endWeatherDrag}
+          title="Geser ke atas atau bawah"
+        >
+          <h5 className="mb-1 text-2xl font-semibold leading-none sm:text-3xl">
+            23<span className="ml-0.5 text-lg leading-none text-yellow-500 sm:text-xl">℃</span>
           </h5>
-          <p className="mb-3 text-left text-xs">Hujan Ringan</p>
+          <p className="mb-2 max-w-full truncate text-center text-[11px] leading-snug text-white/90 sm:text-xs">Hujan Ringan</p>
           <button
             type="button"
             onClick={() => setWeatherOpen((prev) => !prev)}
@@ -222,8 +310,9 @@ export default function Hero() {
           </button>
         </div>
 
-        <div className="pointer-events-auto h-full w-[300px] rounded-bl-2xl rounded-tl-2xl border border-r-0 border-white/25 bg-[#2f3135] p-3 text-white shadow-2xl md:w-[380px]">
-          <main className="flex h-full w-full flex-col gap-4">
+        <div className="pointer-events-auto flex max-h-[min(85dvh,calc(100dvh-8rem))] w-[min(300px,calc(100vw-5rem))] flex-col overflow-hidden rounded-bl-2xl rounded-tl-2xl border border-white/25 bg-[#2f3135] text-white shadow-2xl md:max-h-[min(92vh,700px)] md:w-[380px] md:max-w-none">
+          {/* Atas: tetap, tidak ikut scroll */}
+          <div className="shrink-0 space-y-3 p-3 sm:space-y-4">
             <section className="flex w-full flex-col rounded-xl border border-white/20 bg-[#5b5c5f] p-3">
               <header className="flex items-end justify-between gap-2 leading-none text-white">
                 <h1 className="text-base font-bold">Hari Ini</h1>
@@ -231,14 +320,14 @@ export default function Hero() {
               </header>
               <div className="mb-2 flex items-center justify-between">
                 <div className="text-white">
-                  <div className="mb-2 flex gap-2 text-6xl font-bold leading-none">
+                  <div className="mb-2 flex gap-2 text-5xl font-bold leading-none max-md:text-4xl sm:text-6xl">
                     <h2>23</h2>
-                    <span className="mt-4 text-2xl text-yellow-500">℃</span>
+                    <span className="mt-3 text-xl text-yellow-500 sm:mt-4 sm:text-2xl">℃</span>
                   </div>
                   <p className="text-sm">Hujan Ringan</p>
                 </div>
                 <div className="text-white/90">
-                  <WeatherSymbol type={activeWeatherType} className="h-24 w-24 text-white/90" />
+                  <WeatherSymbol type={activeWeatherType} className="h-16 w-16 text-white/90 sm:h-24 sm:w-24" />
                 </div>
               </div>
               <footer className="flex items-center gap-2 text-white">
@@ -275,28 +364,35 @@ export default function Hero() {
                 </article>
               </div>
             </section>
+          </div>
 
-            <section className="flex flex-col gap-2 overflow-y-auto">
-              {weatherRows.map((w) => (
-                <div key={w.time} className="flex items-center gap-3 rounded-lg border border-white/20 bg-[#45474c] p-3">
-                  <div className="flex rounded-lg bg-white/20 p-1">
-                    <WeatherSymbol type={getWeatherType(w.cond)} className="h-[34px] w-[34px] text-white/90" />
+          {/* Bawah: hanya list prakiraan yang bisa di-scroll */}
+          <div className="flex min-h-0 flex-1 flex-col border-t border-white/10 px-3 pb-3 pt-2">
+            <p className="mb-2 shrink-0 text-[11px] font-semibold uppercase tracking-wide text-white/60">Prakiraan</p>
+            <div className="min-h-0 flex-1 overflow-y-auto overscroll-contain pr-0.5 [-webkit-overflow-scrolling:touch]">
+              <div className="flex flex-col gap-2 pb-1">
+                {weatherRows.map((w) => (
+                  <div key={w.time} className="flex items-center gap-3 rounded-lg border border-white/20 bg-[#45474c] p-3">
+                    <div className="flex rounded-lg bg-white/20 p-1">
+                      <WeatherSymbol type={getWeatherType(w.cond)} className="h-[34px] w-[34px] text-white/90" />
+                    </div>
+                    <article className="flex flex-1 items-center justify-between gap-3 text-white">
+                      <div className="text-sm leading-none">
+                        <h3 className="mb-2 font-bold">{w.time}</h3>
+                        <p>{w.cond}</p>
+                      </div>
+                      <div className="flex items-center gap-1 font-medium leading-none">
+                        <h3>{w.temp}</h3>
+                        <p className="-mt-1 text-3xl font-thin">/</p>
+                        <h3>{w.hum}</h3>
+                      </div>
+                    </article>
                   </div>
-                  <article className="flex flex-1 items-center justify-between gap-3 text-white">
-                    <div className="text-sm leading-none">
-                      <h3 className="mb-2 font-bold">{w.time}</h3>
-                      <p>{w.cond}</p>
-                    </div>
-                    <div className="flex items-center gap-1 font-medium leading-none">
-                      <h3>{w.temp}</h3>
-                      <p className="-mt-1 text-3xl font-thin">/</p>
-                      <h3>{w.hum}</h3>
-                    </div>
-                  </article>
-                </div>
-              ))}
-            </section>
-          </main>
+                ))}
+              </div>
+            </div>
+          </div>
+        </div>
         </div>
       </div>
 
@@ -385,13 +481,14 @@ export default function Hero() {
         </div>
       </div>
 
-      {/* Pemisah gelombang modern: transisi hero → berita */}
-      <div className="relative z-20 mt-10 w-full sm:mt-14" aria-hidden>
+      {/* Pemisah gelombang: overlap 1px ke bawah untuk menghilangkan garis artefak di mobile */}
+      <div className="relative z-20 mt-8 w-full leading-[0] sm:mt-12" aria-hidden>
         <svg
-          className="block h-[64px] w-full text-white sm:h-[80px] md:h-[96px]"
+          className="-mb-px block h-[56px] w-full align-bottom text-white sm:h-[72px] md:h-[88px]"
           viewBox="0 0 1440 120"
           preserveAspectRatio="none"
           xmlns="http://www.w3.org/2000/svg"
+          style={{ shapeRendering: 'geometricPrecision' }}
         >
           <defs>
             <linearGradient id="heroWaveSoft" x1="0%" y1="0%" x2="100%" y2="0%">

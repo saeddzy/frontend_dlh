@@ -1,77 +1,5 @@
 import { useState } from 'react';
-
-const featuredNews = [
-  {
-    image:
-      'https://images.unsplash.com/photo-1542744173-8e7e53415bb0?auto=format&fit=crop&w=1200&q=80',
-    category: 'Kegiatan',
-    title: 'Forum Perangkat Daerah 2024: sinergi kebijakan lingkungan hidup',
-    date: '12 April 2024',
-    author: 'Humas DLH Kota Jambi',
-  },
-  {
-    image:
-      'https://images.unsplash.com/photo-1521737604893-d14cc237f11d?auto=format&fit=crop&w=1200&q=80',
-    category: 'Pengumuman',
-    title: 'DLH Kota Jambi luncurkan gerakan bersama pengurangan sampah plastik',
-    date: '10 April 2024',
-    author: 'Admin DLH',
-  },
-  {
-    image:
-      'https://images.unsplash.com/photo-1473448912268-2022ce9509d8?auto=format&fit=crop&w=1200&q=80',
-    category: 'Lingkungan',
-    title: 'Monitoring kualitas udara perkotaan diperkuat di titik strategis',
-    date: '8 April 2024',
-    author: 'Bidang PPKL',
-  },
-  {
-    image:
-      'https://images.unsplash.com/photo-1618477462146-050d2767eac4?auto=format&fit=crop&w=1200&q=80',
-    category: 'Program',
-    title: 'Kolaborasi edukasi sekolah hijau untuk siswa SMA se-Kota Jambi',
-    date: '6 April 2024',
-    author: 'Tim Edukasi',
-  },
-  {
-    image:
-      'https://images.unsplash.com/photo-1501004318641-b39e6451bec6?auto=format&fit=crop&w=1200&q=80',
-    category: 'Lingkungan',
-    title: 'Penghijauan kawasan prioritas melalui aksi tanam pohon serentak',
-    date: '4 April 2024',
-    author: 'Tim Penghijauan DLH',
-  },
-];
-
-const terbaru = [
-  { title: 'Rapat koordinasi pengelolaan sampah perkotaan Kota Jambi', date: '10 Apr 2024' },
-  { title: 'Sosialisasi perizinan lingkungan bagi pelaku usaha UMKM', date: '8 Apr 2024' },
-  { title: 'Monitoring kualitas air sungai utama di wilayah prioritas', date: '5 Apr 2024' },
-  { title: 'Kegiatan penanaman pohon bersama masyarakat dan komunitas', date: '2 Apr 2024' },
-  { title: 'Uji emisi kendaraan dinas untuk menekan polusi udara perkotaan', date: '31 Mar 2024' },
-  { title: 'Pendampingan bank sampah tingkat kecamatan di Kota Jambi', date: '29 Mar 2024' },
-  { title: 'Penilaian kinerja pengelolaan limbah B3 sektor industri', date: '27 Mar 2024' },
-  { title: 'Aksi bersih sungai bersama komunitas relawan lingkungan', date: '25 Mar 2024' },
-  { title: 'Workshop ekonomi sirkular untuk pelaku usaha lokal', date: '22 Mar 2024' },
-  { title: 'Penguatan sistem informasi pengaduan pencemaran lingkungan', date: '20 Mar 2024' },
-  { title: 'Sosialisasi sekolah adiwiyata tingkat SMA/SMK Kota Jambi', date: '18 Mar 2024' },
-  { title: 'Pembinaan teknis pengelolaan RTH di kawasan perkotaan', date: '15 Mar 2024' },
-];
-
-const terpopuler = [
-  { title: 'Program sungai bersih: update capaian dan kolaborasi multi pihak', date: '28 Mar 2024' },
-  { title: 'Panduan pengurangan emisi untuk industri di Kota Jambi', date: '15 Mar 2024' },
-  { title: 'Pengumuman seleksi tenaga ahli lingkungan — tahap administrasi', date: '10 Mar 2024' },
-  { title: 'Evaluasi AMDAL untuk proyek infrastruktur strategis', date: '5 Mar 2024' },
-  { title: 'Program penghijauan koridor jalan kota capai ribuan bibit', date: '1 Mar 2024' },
-  { title: 'Cara mudah lapor pencemaran melalui aplikasi DLH Mobile', date: '26 Feb 2024' },
-  { title: 'Rekap indeks kualitas udara bulanan wilayah Kota Jambi', date: '22 Feb 2024' },
-  { title: 'Kolaborasi kampus dan DLH untuk riset kualitas air sungai', date: '18 Feb 2024' },
-  { title: 'Panduan teknis pemilahan sampah rumah tangga terbaru', date: '14 Feb 2024' },
-  { title: 'Infografik capaian pengurangan sampah plastik 2024', date: '10 Feb 2024' },
-  { title: 'Penguatan pengawasan dokumen lingkungan berbasis digital', date: '7 Feb 2024' },
-  { title: 'Forum publik kebijakan adaptasi perubahan iklim daerah', date: '4 Feb 2024' },
-];
+import { featuredNews, terbaru, terpopuler } from '../../data/berita.js';
 
 const kepalaDinas = {
   name: 'Nama Kepala Dinas',
@@ -100,30 +28,31 @@ export default function LatestNews() {
   };
 
   return (
-    <section id="informasi-publik" className="scroll-mt-20 bg-white py-14 sm:py-16">
+    <section id="informasi-publik" className="relative -mt-px scroll-mt-20 bg-white py-10 sm:py-14 md:py-16">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-        <h2 className="mb-10 text-center text-2xl font-bold text-gray-900 sm:text-3xl">
+        <h2 className="mb-8 px-1 text-center text-[1.35rem] font-bold leading-snug text-gray-900 text-balance sm:mb-10 sm:text-2xl md:text-3xl">
           Berita Terkini DLH Kota Jambi
         </h2>
 
         <div className="grid gap-8 lg:grid-cols-12 lg:gap-8">
           <article className="lg:col-span-6">
-            <div className="group relative overflow-hidden rounded-2xl shadow-card ring-1 ring-black/5">
-              <div className="relative aspect-[16/12] overflow-hidden sm:aspect-[16/10] lg:h-[580px] lg:aspect-auto">
+            <div className="group relative overflow-hidden rounded-2xl bg-gray-900 shadow-card ring-1 ring-gray-200/80 sm:ring-black/5">
+              {/* Mobile: kartu lebih tinggi (4:5) agar area foto lebih besar; overlay tetap di bawah */}
+              <div className="relative aspect-[4/5] overflow-hidden sm:aspect-[16/10] lg:h-[580px] lg:aspect-auto">
                 <img
                   src={activeFeatured.image}
                   alt={activeFeatured.title}
                   className="h-full w-full object-cover transition duration-500 group-hover:scale-105"
                 />
-                <div className="absolute inset-x-0 bottom-0 h-[72%] bg-gradient-to-t from-black/95 via-black/70 to-transparent" />
-                <div className="absolute inset-x-0 bottom-0 rounded-t-2xl border-t border-white/10 bg-black/35 p-5 pb-20 text-white backdrop-blur-md sm:p-6 sm:pb-24">
+                <div className="absolute inset-x-0 bottom-0 h-[40%] bg-gradient-to-t from-black/88 via-black/40 to-transparent sm:h-[44%] lg:h-[52%]" />
+                <div className="absolute inset-x-0 bottom-0 rounded-t-xl border-t border-white/5 bg-black/25 px-4 pb-[4.25rem] pt-3 text-white backdrop-blur-[2px] sm:rounded-t-2xl sm:border-white/10 sm:bg-black/30 sm:pb-20 sm:pt-4 sm:backdrop-blur-md md:pb-24">
                   <p className="text-xs font-semibold uppercase tracking-[0.12em] text-white/85">
                     {activeFeatured.category}
                   </p>
-                  <h3 className="mt-2 max-w-[92%] text-[2rem] font-extrabold leading-tight tracking-tight text-white sm:text-[2.2rem]">
+                  <h3 className="mt-1.5 max-w-full text-lg font-extrabold leading-snug tracking-tight text-white line-clamp-2 sm:mt-2 sm:line-clamp-3 sm:max-w-[92%] sm:text-2xl md:text-[1.85rem] lg:line-clamp-none lg:text-[2.2rem]">
                     {activeFeatured.title}
                   </h3>
-                  <div className="mt-4 flex flex-wrap items-center gap-x-3 gap-y-1 text-sm font-medium text-white/90">
+                  <div className="mt-2 flex flex-wrap items-center gap-x-3 gap-y-1 text-[11px] font-medium text-white/90 sm:mt-4 sm:text-sm">
                     <span className="inline-flex items-center gap-2">
                       <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
@@ -140,17 +69,17 @@ export default function LatestNews() {
                   </div>
                 </div>
 
-                <div className="absolute bottom-5 left-5 sm:bottom-6 sm:left-6">
+                <div className="absolute bottom-4 left-4 sm:bottom-6 sm:left-6">
                   <a
-                    href="#"
-                    className="inline-flex items-center gap-1 rounded-full border border-white/35 bg-black/25 px-5 py-2.5 text-sm font-semibold text-white backdrop-blur-md transition hover:bg-white/15"
+                    href={`#/berita/${encodeURIComponent(`featured-${featuredIndex}`)}`}
+                    className="inline-flex items-center gap-1 rounded-full border border-white/35 bg-black/25 px-4 py-2 text-xs font-semibold text-white backdrop-blur-md transition hover:bg-white/15 sm:px-5 sm:py-2.5 sm:text-sm"
                   >
                     Baca Selengkapnya
                     <span aria-hidden>→</span>
                   </a>
                 </div>
 
-                <div className="absolute bottom-5 right-5 flex items-center gap-2 rounded-full border border-white/20 bg-black/55 px-3 py-1.5 text-sm font-semibold text-white backdrop-blur-md sm:bottom-6 sm:right-6">
+                <div className="absolute bottom-4 right-4 flex max-w-[calc(100%-1rem)] items-center gap-1.5 rounded-full border border-white/20 bg-black/55 px-2.5 py-1.5 text-xs font-semibold text-white backdrop-blur-md sm:bottom-6 sm:right-6 sm:gap-2 sm:px-3 sm:text-sm">
                   <button
                     type="button"
                     onClick={prevFeatured}
@@ -209,7 +138,7 @@ export default function LatestNews() {
                 {list.map((item, i) => (
                   <li key={i}>
                     <a
-                      href="#"
+                      href={`#/berita/${encodeURIComponent(tab === 'terbaru' ? `terbaru-${i}` : `populer-${i}`)}`}
                       className="group block rounded-xl border border-transparent bg-white px-3 py-3 transition-all duration-200 hover:-translate-y-0.5 hover:border-emerald-100 hover:bg-emerald-50/55 hover:shadow-sm"
                     >
                       <p className="text-[11px] font-bold uppercase tracking-[0.12em] text-emerald-600/85">
@@ -225,7 +154,7 @@ export default function LatestNews() {
               </ul>
             </div>
             <a
-              href="#"
+              href="#/berita"
               className="mt-6 inline-flex w-auto self-center items-center justify-center rounded-full border-2 border-dlh-green px-6 py-2.5 text-sm font-semibold text-dlh-green transition hover:bg-dlh-green hover:text-white lg:mt-auto"
             >
               Lihat Semua Berita

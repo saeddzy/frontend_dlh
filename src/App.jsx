@@ -2,12 +2,26 @@ import Navbar from './components/Layout/Navbar.jsx';
 import Hero from './components/sections/Hero.jsx';
 import LatestNews from './components/sections/LatestNews.jsx';
 import Programs from './components/sections/Programs.jsx';
+import FAQ from './components/sections/FAQ.jsx';
 import Gallery from './components/sections/Gallery.jsx';
 import Footer from './components/Layout/Footer.jsx';
+import ScrollToTop from './components/Layout/ScrollToTop.jsx';
+import PageNavigationLoader from './components/Layout/PageNavigationLoader.jsx';
 import ProfilePage from './components/pages/ProfilePage.jsx';
 import InnerPageTemplate from './components/pages/InnerPageTemplate.jsx';
 import LoginPage from './components/pages/LoginPage.jsx';
+import AdminDashboardPage from './components/pages/AdminDashboardPage.jsx';
+import AllNewsPage from './components/pages/AllNewsPage.jsx';
+import AllGalleryPage from './components/pages/AllGalleryPage.jsx';
+import AllProgramsPage from './components/pages/AllProgramsPage.jsx';
+import ProgramDetailPage from './components/pages/ProgramDetailPage.jsx';
+import NewsDetailPage from './components/pages/NewsDetailPage.jsx';
+import { getProgramById } from './data/program.js';
 import { useEffect, useState } from 'react';
+
+/** Durasi minimum overlay navigasi (ms) — dibuat cepat agar terasa responsif. */
+const NAV_LOADING_MIN_MS = 520;
+const NAV_LOADING_EXIT_MS = 180;
 
 function getRouteFromHash() {
   const hash = window.location.hash || '#/';
@@ -17,17 +31,61 @@ function getRouteFromHash() {
 
 function App() {
   const [route, setRoute] = useState(getRouteFromHash);
+  const [navLoading, setNavLoading] = useState(false);
+  const [navLoaderMounted, setNavLoaderMounted] = useState(false);
+  const [navLoaderClosing, setNavLoaderClosing] = useState(false);
 
   useEffect(() => {
-    const onHashChange = () => setRoute(getRouteFromHash());
+    const onHashChange = () => {
+      setNavLoaderMounted(true);
+      setNavLoaderClosing(false);
+      setNavLoading(true);
+      setRoute(getRouteFromHash());
+    };
     window.addEventListener('hashchange', onHashChange);
     return () => window.removeEventListener('hashchange', onHashChange);
   }, []);
+
+  /** Sembunyikan overlay setelah konten berganti + durasi minimum agar Lottie terbaca */
+  useEffect(() => {
+    if (!navLoading) return undefined;
+    const t = window.setTimeout(() => setNavLoading(false), NAV_LOADING_MIN_MS);
+    return () => window.clearTimeout(t);
+  }, [route, navLoading]);
+
+  /** Unmount loader setelah animasi exit selesai */
+  useEffect(() => {
+    if (navLoading) {
+      setNavLoaderMounted(true);
+      setNavLoaderClosing(false);
+      return undefined;
+    }
+    if (!navLoaderMounted) return undefined;
+    setNavLoaderClosing(true);
+    const t = window.setTimeout(() => {
+      setNavLoaderMounted(false);
+      setNavLoaderClosing(false);
+    }, NAV_LOADING_EXIT_MS);
+    return () => window.clearTimeout(t);
+  }, [navLoading, navLoaderMounted]);
 
   const isStrukturPage = route === '/profil/struktur-organisasi';
   const isTupoksiPage = route === '/profil/tupoksi-dinas';
   const isHome = route === '/';
   const isLoginPage = route === '/login';
+  const isAdminPage = route === '/admin';
+  const isAllNewsPage = route === '/berita';
+  const isAllGalleryPage = route === '/galeri/semua';
+  const isProgramsListPage = route === '/program';
+  const programDetailId =
+    route.startsWith('/program/') && route.length > '/program/'.length
+      ? decodeURIComponent(route.slice('/program/'.length))
+      : null;
+  const programDetail = programDetailId ? getProgramById(programDetailId) : null;
+  const beritaDetailId =
+    route.startsWith('/berita/') && route.length > '/berita/'.length
+      ? decodeURIComponent(route.slice('/berita/'.length))
+      : null;
 
   const templatePages = {
     '/unit-kerja': {
@@ -120,8 +178,11 @@ function App() {
 
   return (
     <>
+      {navLoaderMounted && <PageNavigationLoader isClosing={navLoaderClosing} />}
       {isLoginPage ? (
         <LoginPage />
+      ) : isAdminPage ? (
+        <AdminDashboardPage />
       ) : (
         <>
           <Navbar />
@@ -131,8 +192,43 @@ function App() {
                 <Hero />
                 <LatestNews />
                 <Programs />
+                <FAQ />
                 <Gallery />
               </>
+            ) : beritaDetailId ? (
+              <NewsDetailPage id={beritaDetailId} />
+            ) : isAllNewsPage ? (
+              <InnerPageTemplate
+                title="Semua Berita"
+                subtitle="Arsip berita dan informasi Dinas Lingkungan Hidup Kota Jambi."
+              >
+                <AllNewsPage />
+              </InnerPageTemplate>
+            ) : isAllGalleryPage ? (
+              <InnerPageTemplate
+                title="Semua Galeri"
+                subtitle="Dokumentasi foto dan video kegiatan Dinas Lingkungan Hidup Kota Jambi."
+              >
+                <AllGalleryPage />
+              </InnerPageTemplate>
+            ) : programDetailId ? (
+              <InnerPageTemplate
+                title={programDetail?.title ?? 'Program'}
+                subtitle={
+                  programDetail?.summary ??
+                  'Program unggulan Dinas Lingkungan Hidup Kota Jambi.'
+                }
+                heroImage={programDetail?.coverImage}
+              >
+                <ProgramDetailPage id={programDetailId} />
+              </InnerPageTemplate>
+            ) : isProgramsListPage ? (
+              <InnerPageTemplate
+                title="Program Unggulan"
+                subtitle="Inisiatif strategis untuk mendukung pembangunan berkelanjutan dan kesejahteraan masyarakat Kota Jambi."
+              >
+                <AllProgramsPage />
+              </InnerPageTemplate>
             ) : isStrukturPage || isTupoksiPage ? (
               <InnerPageTemplate
                 title={isStrukturPage ? 'Struktur Organisasi' : 'Tugas Pokok dan Fungsi'}
@@ -159,6 +255,7 @@ function App() {
             )}
           </main>
           <Footer />
+          <ScrollToTop />
         </>
       )}
     </>

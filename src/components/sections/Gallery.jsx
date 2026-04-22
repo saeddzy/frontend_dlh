@@ -1,31 +1,13 @@
-import { useState } from 'react';
-
-const photos = [
-  'https://images.unsplash.com/photo-1524178232363-1fb2b075b655?auto=format&fit=crop&w=600&q=80',
-  'https://images.unsplash.com/photo-1556761175-5973dc0f32e7?auto=format&fit=crop&w=600&q=80',
-  'https://images.unsplash.com/photo-1517245386807-bb43f82c33c4?auto=format&fit=crop&w=600&q=80',
-  'https://images.unsplash.com/photo-1542744173-8e7e53415bb0?auto=format&fit=crop&w=600&q=80',
-  'https://images.unsplash.com/photo-1504384308090-c54be3855833?auto=format&fit=crop&w=600&q=80',
-  'https://images.unsplash.com/photo-1522071820081-009f0129c71c?auto=format&fit=crop&w=600&q=80',
-  'https://images.unsplash.com/photo-1497366216548-37526070297c?auto=format&fit=crop&w=600&q=80',
-  'https://images.unsplash.com/photo-1552664730-d307ca884978?auto=format&fit=crop&w=600&q=80',
-];
+import { useMemo, useState } from 'react';
+import { getGalleryPreviewPhotos } from '../../data/galeri.js';
+import GalleryPhotoLightbox from '../gallery/GalleryPhotoLightbox.jsx';
 
 export default function Gallery() {
+  const photos = useMemo(() => getGalleryPreviewPhotos(), []);
   const [selectedPhoto, setSelectedPhoto] = useState(null);
-  const [isClosing, setIsClosing] = useState(false);
 
   const openPhoto = (src) => {
-    setIsClosing(false);
     setSelectedPhoto(src);
-  };
-
-  const closePhoto = () => {
-    setIsClosing(true);
-    window.setTimeout(() => {
-      setSelectedPhoto(null);
-      setIsClosing(false);
-    }, 250);
   };
 
   return (
@@ -57,33 +39,16 @@ export default function Gallery() {
 
         <div className="mt-8 flex justify-end">
           <a
-            href="#"
+            href="#/galeri/semua"
             className="inline-flex items-center justify-center rounded-full border-2 border-dlh-green px-6 py-2.5 text-sm font-semibold text-dlh-green transition hover:bg-dlh-green hover:text-white"
           >
-            Lihat Semua Gallery
+            Lihat Semua Galeri
           </a>
         </div>
       </div>
 
       {selectedPhoto && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 px-4 py-6">
-          <div className={`relative max-h-[90vh] w-full max-w-5xl overflow-hidden rounded-3xl bg-black shadow-2xl transition-all duration-300 ease-out ${
-            isClosing ? 'opacity-0 scale-95' : 'opacity-100 scale-100'
-          }`}>
-            <button
-              type="button"
-              onClick={closePhoto}
-              className="absolute right-4 top-4 inline-flex h-10 w-10 items-center justify-center rounded-full bg-white/10 text-white transition hover:bg-white/20 active:scale-95"
-              aria-label="Tutup preview gambar"
-            >
-              <svg className="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round">
-                <line x1="18" y1="6" x2="6" y2="18" />
-                <line x1="6" y1="6" x2="18" y2="18" />
-              </svg>
-            </button>
-            <img src={selectedPhoto} alt="Preview galeri" className="max-h-[90vh] w-full object-contain" />
-          </div>
-        </div>
+        <GalleryPhotoLightbox src={selectedPhoto} onClose={() => setSelectedPhoto(null)} />
       )}
     </section>
   );

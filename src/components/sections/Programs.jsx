@@ -1,78 +1,91 @@
-const programs = [
-  {
-    icon: (
-      <span className="text-2xl" aria-hidden>
-        🌿
-      </span>
-    ),
-    title: 'Taman Kehati Kota Jambi',
-    desc: 'Pelestarian keanekaragaman hayati dan edukasi lingkungan melalui kawasan konservasi serta kegiatan masyarakat.',
-  },
-  {
-    icon: (
-      <span className="text-2xl" aria-hidden>
-        💧
-      </span>
-    ),
-    title: 'Sungai & Kawasan Hijau',
-    desc: 'Program terpadu untuk menjaga kualitas perairan perkotaan, mengendalikan pencemaran, dan melibatkan masyarakat Kota Jambi.',
-  },
-  {
-    icon: (
-      <span className="text-2xl" aria-hidden>
-        ♻
-      </span>
-    ),
-    title: 'Sampah Kita',
-    desc: 'Gerakan pengelolaan sampah dari hulu ke hilir: pilah, kurangi, dan manfaatkan untuk lingkungan yang lebih bersih.',
-  },
-];
+import { getAllPrograms, getProgramCardVisual } from '../../data/program.js';
+import ProgramCardArt from '../programs/ProgramCardArt.jsx';
 
 export default function Programs() {
+  const programs = getAllPrograms();
+  const total = programs.length;
+
   return (
     <section id="layanan" className="scroll-mt-20 bg-dlh-muted py-14 sm:py-16">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <div className="mx-auto mb-12 max-w-3xl text-center">
-          <h2 className="text-2xl font-bold text-gray-900 sm:text-3xl">Program Unggulan DLH Kota Jambi</h2>
-          <p className="mt-3 text-sm text-gray-600 sm:text-base">
-            Inisiatif strategis untuk mendukung pembangunan berkelanjutan dan kesejahteraan masyarakat Kota Jambi.
+          <p className="text-xs font-semibold uppercase tracking-[0.22em] text-emerald-700/90">Program unggulan</p>
+          <h2 className="mt-2 text-2xl font-bold tracking-tight text-slate-900 sm:text-3xl">
+            DLH Kota Jambi
+          </h2>
+          <p className="mt-3 text-sm leading-relaxed text-slate-600 sm:text-base">
+            Inisiatif strategis untuk pembangunan berkelanjutan dan kesejahteraan masyarakat.
           </p>
         </div>
 
-        <div className="grid gap-6 md:grid-cols-3">
+        <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3 lg:gap-6">
           {programs.map((p, idx) => (
-            <article
-              key={p.title}
-              className="group relative flex min-h-[280px] flex-col overflow-hidden rounded-3xl border border-emerald-100/70 bg-gradient-to-b from-white to-emerald-50/35 p-6 shadow-card transition-all duration-300 hover:-translate-y-1.5 hover:border-emerald-200 hover:shadow-xl"
+            <a
+              key={p.id}
+              href={`#/program/${encodeURIComponent(p.id)}`}
+              className="group relative block overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm transition-all duration-300 hover:-translate-y-0.5 hover:border-emerald-200 hover:shadow-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500/45 focus-visible:ring-offset-2"
             >
-              <div className="pointer-events-none absolute -right-8 -top-8 h-24 w-24 rounded-full bg-emerald-200/40 blur-2xl transition duration-300 group-hover:bg-emerald-300/60" />
-              <div className="pointer-events-none absolute -bottom-10 -left-8 h-24 w-24 rounded-full bg-emerald-100/40 blur-2xl transition duration-300 group-hover:bg-emerald-200/50" />
-
-              <div className="mb-3 inline-flex w-fit rounded-full bg-emerald-100 px-3 py-1 text-[11px] font-bold uppercase tracking-[0.12em] text-emerald-700">
-                Program {idx + 1}
+              {/* Ilustrasi: naik dari bawah (satu gerakan jelas, tanpa blur/shimmer) */}
+              <div className="pointer-events-none absolute inset-0 overflow-hidden" aria-hidden>
+                <div
+                  className="h-full min-h-[260px] w-full translate-y-[105%] opacity-100 transition-[transform] duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] will-change-transform group-hover:translate-y-0 motion-reduce:translate-y-0 motion-reduce:opacity-0 motion-reduce:transition-opacity motion-reduce:duration-300 motion-reduce:group-hover:opacity-100"
+                >
+                  <ProgramCardArt
+                    variant="watermark"
+                    visual={getProgramCardVisual(p, idx)}
+                    index={idx}
+                    total={total}
+                    className="h-full min-h-[260px]"
+                  />
+                </div>
               </div>
 
-              <div className="mb-4 inline-flex h-12 w-12 items-center justify-center rounded-xl bg-emerald-50 text-2xl ring-1 ring-emerald-100 transition duration-300 group-hover:scale-110 group-hover:bg-emerald-100 group-hover:ring-emerald-200">
-                {p.icon}
-              </div>
-              <h3 className="text-lg font-bold text-gray-900 transition-colors duration-300 group-hover:text-emerald-700">
-                {p.title}
-              </h3>
-              <p className="mt-2 flex-1 text-sm leading-relaxed text-gray-600">{p.desc}</p>
+              {/* Scrim kiri: menjaga teks tetap kontras saat ilustrasi muncul */}
+              <div
+                className="pointer-events-none absolute inset-0 z-[1] bg-gradient-to-r from-white from-[42%] via-white/88 to-transparent opacity-0 transition-opacity duration-300 group-hover:opacity-100 motion-reduce:opacity-100 motion-reduce:via-white/95"
+                aria-hidden
+              />
 
-              <a
-                href="#"
-                className="mt-5 inline-flex w-fit items-center gap-2 rounded-full bg-emerald-100/80 px-4 py-2 text-sm font-semibold text-dlh-green transition-all duration-300 hover:bg-dlh-green hover:text-white"
-              >
-                Selengkapnya
-                <span className="transition-transform duration-300 group-hover:translate-x-1" aria-hidden>
-                  →
+              <div className="relative z-10 flex min-h-[240px] flex-col p-6 sm:p-7">
+                <span className="font-mono text-[11px] font-medium tabular-nums text-slate-400">
+                  {String(idx + 1).padStart(2, '0')}
+                  <span className="text-slate-300"> / {String(total).padStart(2, '0')}</span>
                 </span>
-              </a>
+                <h3 className="mt-3 text-base font-semibold leading-snug tracking-tight text-slate-900 transition-colors duration-300 group-hover:text-emerald-900">
+                  {p.title}
+                </h3>
+                <p className="mt-2 flex-1 text-sm leading-relaxed text-slate-600 line-clamp-3">{p.summary}</p>
+                <span className="mt-6 inline-flex w-fit items-center gap-1.5 text-sm font-semibold text-emerald-700 transition-all duration-300 group-hover:gap-2.5 group-hover:text-emerald-800">
+                  Lihat program
+                  <svg
+                    className="h-4 w-4 shrink-0 transition-transform duration-300 group-hover:translate-x-0.5"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    aria-hidden
+                  >
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M5 12h14m0 0-6-6m6 6-6 6" />
+                  </svg>
+                </span>
+              </div>
 
-              <div className="mt-5 h-1 w-full rounded-full bg-gradient-to-r from-emerald-400 to-dlh-green/90" />
-            </article>
+              {/* Aksen garis kiri — tumbuh saat hover */}
+              <span
+                className="absolute bottom-6 left-0 top-6 w-0.5 origin-top scale-y-0 rounded-full bg-emerald-500/0 transition-all duration-300 group-hover:scale-y-100 group-hover:bg-emerald-500/70"
+                aria-hidden
+              />
+            </a>
           ))}
+        </div>
+
+        <div className="mt-10 flex justify-center">
+          <a
+            href="#/program"
+            className="inline-flex items-center justify-center rounded-full border border-slate-300 bg-white px-6 py-2.5 text-sm font-semibold text-slate-800 shadow-sm transition hover:border-emerald-600 hover:text-emerald-800"
+          >
+            Semua program
+          </a>
         </div>
       </div>
     </section>

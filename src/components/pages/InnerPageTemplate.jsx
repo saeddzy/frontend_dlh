@@ -1,11 +1,14 @@
-export default function InnerPageTemplate({ title, subtitle, children }) {
+export default function InnerPageTemplate({ title, subtitle, children, heroImage }) {
+  const heroSrc =
+    heroImage ||
+    'https://images.unsplash.com/photo-1542601906990-b4d3fb778b09?auto=format&fit=crop&w=1920&q=80';
   return (
     <section className="pb-16">
       <div className="relative h-[340px] pt-24 sm:h-[380px] sm:pt-28">
         <div className="absolute inset-0 z-0">
           <img
-            src="https://images.unsplash.com/photo-1542601906990-b4d3fb778b09?auto=format&fit=crop&w=1920&q=80"
-            alt="Hero halaman internal DLH Kota Jambi"
+            src={heroSrc}
+            alt=""
             className="h-full w-full object-cover"
           />
           <div className="absolute inset-0 bg-gradient-to-b from-black/55 via-black/45 to-black/65" />

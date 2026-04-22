@@ -16,10 +16,12 @@ const menus = [
   },
   { href: '#/dokumen', label: 'Dokumen' },
   { href: '#/aplikasi', label: 'Aplikasi' },
+  { href: '#/program', label: 'Program' },
   {
     href: '#/galeri',
     label: 'Galeri',
     children: [
+      { href: '#/galeri/semua', label: 'Semua Galeri' },
       { href: '#/galeri/foto', label: 'Foto' },
       { href: '#/galeri/video', label: 'Video' },
     ],

@@ -9,7 +9,7 @@
 
   body {
     margin: 0;
-    @apply font-sans text-gray-800 antialiased;
+    @apply bg-white font-sans text-gray-800 antialiased;
   }
 
   #root {
@@ -106,4 +106,190 @@
 
 .weather-lightning-flash {
   animation: weather-lightning-flash 1.6s steps(1, end) infinite;
+}
+
+/* Kartu program: air mengisi (loop) */
+.program-art-water-fill {
+  transform-origin: 200px 0;
+  transform: scaleY(0.42);
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .program-art-water-fill {
+    animation: program-art-water-pulse 5s ease-in-out infinite;
+  }
+
+  .program-art-water-shimmer {
+    animation: program-art-water-line 3.5s ease-in-out infinite;
+  }
+
+  .program-art-water-bubble-a {
+    animation: program-art-bubble-rise 3.2s ease-in infinite 0s;
+  }
+
+  .program-art-water-bubble-b {
+    animation: program-art-bubble-rise 3.8s ease-in infinite 0.8s;
+  }
+
+  .program-art-water-bubble-c {
+    animation: program-art-bubble-rise 4.1s ease-in infinite 1.4s;
+  }
+
+  .program-art-plant-a {
+    animation: program-art-plant-sway 4.2s ease-in-out infinite;
+  }
+
+  .program-art-plant-b {
+    animation: program-art-plant-sway 4.8s ease-in-out infinite 0.35s;
+  }
+
+  .program-art-plant-c {
+    animation: program-art-plant-sway 4.5s ease-in-out infinite 0.65s;
+  }
+
+  .program-art-plant-d {
+    animation: program-art-plant-sway 5s ease-in-out infinite 0.2s;
+  }
+
+  .program-art-plant-sparkle {
+    animation: program-art-sparkle 2.8s ease-in-out infinite;
+  }
+
+  .program-art-cloud-layer-back {
+    animation: program-art-cloud-back 10s ease-in-out infinite;
+  }
+
+  .program-art-cloud-layer-front {
+    animation: program-art-cloud-front 7.4s ease-in-out infinite;
+  }
+
+  .program-art-cloud-layer-mid {
+    animation: program-art-cloud-mid 5.6s ease-in-out infinite;
+  }
+
+  .program-art-cloud-haze {
+    animation: program-art-cloud-haze 4.4s ease-in-out infinite;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .program-art-water-fill {
+    transform: scaleY(0.68);
+  }
+
+  .program-art-cloud-layer-back,
+  .program-art-cloud-layer-front,
+  .program-art-cloud-layer-mid,
+  .program-art-cloud-haze {
+    animation: none;
+  }
+}
+
+@keyframes program-art-water-pulse {
+  0%,
+  100% {
+    transform: scaleY(0.38);
+  }
+  50% {
+    transform: scaleY(0.94);
+  }
+}
+
+@keyframes program-art-water-line {
+  0%,
+  100% {
+    opacity: 0.25;
+  }
+  50% {
+    opacity: 0.55;
+  }
+}
+
+@keyframes program-art-bubble-rise {
+  0% {
+    transform: translateY(0);
+    opacity: 0.55;
+  }
+  85% {
+    opacity: 0.2;
+  }
+  100% {
+    transform: translateY(-70px);
+    opacity: 0;
+  }
+}
+
+@keyframes program-art-plant-sway {
+  0%,
+  100% {
+    transform: rotate(-2deg) scaleY(0.94);
+  }
+  50% {
+    transform: rotate(3deg) scaleY(1.05);
+  }
+}
+
+@keyframes program-art-sparkle {
+  0%,
+  100% {
+    opacity: 0.35;
+  }
+  50% {
+    opacity: 0.75;
+  }
+}
+
+@keyframes program-art-cloud-back {
+  0%,
+  100% {
+    transform: translateX(0);
+  }
+  50% {
+    transform: translateX(-8px);
+  }
+}
+
+@keyframes program-art-cloud-front {
+  0%,
+  100% {
+    transform: translateX(0);
+    opacity: 0.92;
+  }
+  50% {
+    transform: translateX(14px);
+    opacity: 1;
+  }
+}
+
+@keyframes program-art-cloud-mid {
+  0%,
+  100% {
+    transform: translateX(0);
+    opacity: 0.78;
+  }
+  50% {
+    transform: translateX(-9px);
+    opacity: 0.94;
+  }
+}
+
+@keyframes program-art-cloud-haze {
+  0%,
+  100% {
+    opacity: 0.45;
+  }
+  50% {
+    opacity: 0.75;
+  }
+}
+
+.program-card-art-svg-interactive {
+  transform: scale(1);
+  transition: transform 0.45s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .group:hover .program-card-art-svg-interactive {
+    transform: scale(1.03);
+  }
 }

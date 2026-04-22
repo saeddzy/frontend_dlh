@@ -12,6 +12,10 @@ export default {
       },
       fontFamily: {
         sans: ['Inter', 'system-ui', 'Segoe UI', 'Roboto', 'sans-serif'],
+        serif: ['"Source Serif 4"', 'Georgia', 'Cambria', 'serif'],
+      },
+      maxWidth: {
+        article: '42rem',
       },
       boxShadow: {
         card: '0 10px 25px -5px rgba(0, 0, 0, 0.08), 0 4px 10px -4px rgba(0, 0, 0, 0.06)',
